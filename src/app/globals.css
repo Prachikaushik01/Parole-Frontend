@@ -1,26 +1,589 @@
 @import "tailwindcss";
 
+@theme {
+  /* PAROLE design system — restrained graphite & carbon palette */
+  --color-canvas: #09090b;
+  --color-surface: #101013;
+  --color-raised: #16161a;
+  --color-edge: #1f1f24;
+  --color-edge-strong: #2e2e36;
+
+  --color-safe: #10b981;
+  --color-tier1: #06b6d4;
+  --color-tier2: #f59e0b;
+  --color-threat: #ef4444;
+
+  --color-ink: #f4f4f5;
+  --color-ink-dim: #a1a1aa;
+  --color-ink-faint: #71717a;
+
+  --font-sans: var(--font-geist-sans), Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background-color: var(--color-canvas);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-canvas);
+  color: var(--color-ink-dim);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: rgb(16 185 129 / 0.28);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-safe);
+  outline-offset: 2px;
+}
+
+/* Thin dark scrollbars for telemetry surfaces */
+.scroll-slim {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-edge-strong) transparent;
+}
+.scroll-slim::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.scroll-slim::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-slim::-webkit-scrollbar-thumb {
+  background-color: var(--color-edge-strong);
+  border-radius: 4px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Home visual-design utilities (grid texture, lighting, diagram keyframes)   */
+/* -------------------------------------------------------------------------- */
+
+/* Subtle technical grid used as a background texture on key sections. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(39 39 42 / 0.16) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(39 39 42 / 0.16) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Home-only refined grid: whisper-quiet structural guides. */
+.bg-grid-home {
+  background-image:
+    linear-gradient(to right, rgb(63 63 70 / 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(63 63 70 / 0.08) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Subtle diagonal light catch for layered dark surfaces. */
+.surface-sheen {
+  background-image: linear-gradient(
+    135deg,
+    rgb(255 255 255 / 0.025) 0%,
+    transparent 42%
+  );
+}
+
+/* Fade the grid toward the bottom edge so it reads as depth, not wallpaper. */
+.grid-fade {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0.75) 0%,
+    rgb(0 0 0 / 0.35) 55%,
+    transparent 92%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0.75) 0%,
+    rgb(0 0 0 / 0.35) 55%,
+    transparent 92%
+  );
+}
+
+/* Restrained lighting wash for backdrop depth. */
+.glow-field {
+  background: radial-gradient(
+    640px circle at 50% 0%,
+    rgb(255 255 255 / 0.03),
+    transparent 65%
+  );
+}
+
+/* Home-only lighting variant: subtle top-center ambient light. */
+.glow-field-home {
+  background: radial-gradient(
+    800px circle at 65% 0%,
+    rgb(16 185 129 / 0.045),
+    transparent 65%
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Home ambient atmosphere (decorative background only)                       */
+/*                                                                            */
+/* Additive emerald/cyan lighting, a finer engineering grid, animated circuit  */
+/* traces, connected network nodes, and a scanning light. All of it sits       */
+/* behind Home content, is masked toward the edges, and is disabled by the     */
+/* global prefers-reduced-motion rule at the bottom of this file. Nothing      */
+/* here is used by the Setup or Cockpit views.                                 */
+/* -------------------------------------------------------------------------- */
+
+/* Additive emerald/cyan depth beyond the base glow. */
+.glow-atmos {
+  background:
+    radial-gradient(
+      640px circle at 22% 6%,
+      rgb(6 182 212 / 0.085),
+      transparent 60%
+    ),
+    radial-gradient(
+      520px circle at 88% 34%,
+      rgb(16 185 129 / 0.07),
+      transparent 62%
+    ),
+    radial-gradient(
+      760px circle at 50% 118%,
+      rgb(16 185 129 / 0.06),
+      transparent 68%
+    ),
+    radial-gradient(
+      360px circle at 4% 90%,
+      rgb(6 182 212 / 0.045),
+      transparent 68%
+    );
+}
+
+/* Fine engineering grid — a third, tighter scale layered over .bg-grid-home. */
+.bg-grid-fine {
+  background-image:
+    linear-gradient(to right, rgb(63 63 70 / 0.16) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(63 63 70 / 0.16) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Radial edge mask for atmospheric layers: keeps the centre readable and
+   dissolves the texture into the canvas at every border. */
+.atmos-mask {
+  -webkit-mask-image: radial-gradient(
+    115% 95% at 50% 32%,
+    rgb(0 0 0 / 0.95) 0%,
+    rgb(0 0 0 / 0.5) 52%,
+    transparent 82%
+  );
+  mask-image: radial-gradient(
+    115% 95% at 50% 32%,
+    rgb(0 0 0 / 0.95) 0%,
+    rgb(0 0 0 / 0.5) 52%,
+    transparent 82%
+  );
+}
+
+/* Concentrated circuit glow used at hero scale: bright near the top, gone by
+   the fold, so the headline band never fights the pattern. */
+.atmos-mask-hero {
+  -webkit-mask-image: radial-gradient(
+    135% 115% at 62% 12%,
+    rgb(0 0 0 / 0.9) 0%,
+    rgb(0 0 0 / 0.32) 44%,
+    transparent 74%
+  );
+  mask-image: radial-gradient(
+    135% 115% at 62% 12%,
+    rgb(0 0 0 / 0.9) 0%,
+    rgb(0 0 0 / 0.32) 44%,
+    transparent 74%
+  );
+}
+
+/* Restrained top-down scan sweeping a decorative panel. */
+@keyframes parole-scan-sweep {
+  0% {
+    top: -18%;
+    opacity: 0;
+  }
+  12%,
+  82% {
+    opacity: 0.55;
+  }
+  100% {
+    top: 118%;
+    opacity: 0;
+  }
+}
+
+/* Light pulsing along a static circuit trace. */
+@keyframes parole-circuit-trace {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+/* Slow breathing halo for connected network nodes. */
+@keyframes parole-node-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    box-shadow: 0 0 0 0 rgb(16 185 129 / 0);
+  }
+  50% {
+    opacity: 0.85;
+    box-shadow: 0 0 0 4px rgb(16 185 129 / 0.06);
+  }
+}
+
+.visual-scan {
+  animation: parole-scan-sweep 9s ease-in-out infinite;
+}
+
+.visual-trace {
+  animation: parole-circuit-trace 6.5s ease-in-out infinite;
+}
+
+.visual-node {
+  animation: parole-node-pulse 5.2s ease-in-out infinite;
+}
+
+
+/* Crimson hazard band for the hard security boundary panel. */
+.hazard-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgb(239 68 68 / 0.18) 0 10px,
+    transparent 10px 20px
+  );
+}
+
+/* --- Routing-diagram keyframes (hero visual) ------------------------------ */
+
+@keyframes parole-lane-flow {
+  0% {
+    left: -4%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: 104%;
+    opacity: 0;
+  }
+}
+
+@keyframes parole-block-bounce {
+  0% {
+    left: -4%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  46%,
+  58% {
+    left: 58%;
+    opacity: 1;
+  }
+  100% {
+    left: -4%;
+    opacity: 0;
+  }
+}
+
+@keyframes parole-gov-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(16 185 129 / 0.28);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgb(16 185 129 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(16 185 129 / 0);
+  }
+}
+
+@keyframes parole-block-flash {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.visual-lane-dot {
+  animation: parole-lane-flow var(--lane-duration, 2.8s) linear infinite;
+}
+.visual-block-dot {
+  animation: parole-block-bounce 2.9s ease-in-out infinite;
+}
+.visual-gov-pulse {
+  animation: parole-gov-pulse 2.9s ease-out infinite;
+}
+.visual-block-flash {
+  animation: parole-block-flash 2.9s ease-in-out infinite;
+}
+
+/* Film-grain noise for layered depth (hero, setup). */
+.noise-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+}
+
+/* Very subtle CRT scanlines for the setup terminal body. */
+.scanlines {
+  position: relative;
+}
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.014) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+/* --- Approval-loop keyframes (permission-fatigue story) ------------------- */
+
+@keyframes parole-tick-lit {
+  0%,
+  100% {
+    opacity: 0.12;
+  }
+  12%,
+  80% {
+    opacity: 1;
+  }
+}
+
+.visual-tick {
+  animation: parole-tick-lit 5.2s ease-in-out infinite;
+}
+
+@keyframes parole-attention-drain {
+  0% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0.08);
+  }
+}
+
+.visual-attention {
+  transform-origin: left center;
+  animation: parole-attention-drain 5.2s ease-in-out infinite alternate;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Interaction feedback                                                       */
+/*                                                                            */
+/* Small, shared hover/press utilities built from the existing design tokens.  */
+/* They only ever adjust transform, border, background and shadow — never      */
+/* layout, size or typography. The global reduced-motion rule at the bottom    */
+/* of this file collapses their transitions automatically.                     */
+/* -------------------------------------------------------------------------- */
+
+/* Smooth, consistent timing for interactive surfaces (150–220ms). */
+.press {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 180ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Subtle press-down on activation, easing back to rest. `:not(:disabled)`
+   keeps disabled controls visually inert. */
+.press:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+/* Semantic hover rings — a restrained 1px-tinted border plus a low-opacity,
+   short-throw shadow. Deliberately no heavy neon. Pair with `.press` (or any
+   element that already transitions border/shadow) for the timing. */
+.ring-emerald:hover:not(:disabled) {
+  border-color: rgb(16 185 129 / 0.45);
+}
+
+.ring-cyan:hover:not(:disabled) {
+  border-color: rgb(6 182 212 / 0.45);
+}
+
+.ring-amber:hover:not(:disabled) {
+  border-color: rgb(245 158 11 / 0.45);
+}
+
+.ring-red:hover:not(:disabled) {
+  border-color: rgb(239 68 68 / 0.45);
+}
+
+/* Neutral ring for quiet controls that have no semantic colour. */
+.ring-neutral:hover:not(:disabled) {
+  border-color: rgb(63 63 70 / 0.85);
+}
+
+/* Restrained glass surface: translucent dark panel, fine light border,
+   soft inner top highlight, deep soft shadow. Used for the hero console
+   and other premium surfaces. */
+.glass {
+  background-color: rgb(18 18 21 / 0.62);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.05),
+    0 40px 80px -44px rgb(0 0 0 / 0.7);
+}
+
+/* Dashed vertical spine flow (hero routing visual). */
+@keyframes parole-spine-flow {
+  to {
+    background-position: 0 -12px;
+  }
+}
+
+.visual-spine {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    var(--color-edge-strong) 0 4px,
+    transparent 4px 8px
+  );
+  animation: parole-spine-flow 1.1s linear infinite;
+}
+
+/* --- Terminal caret (setup page) ------------------------------------------ */
+
+@keyframes parole-caret {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.visual-caret {
+  animation: parole-caret 1.1s steps(1) infinite;
+}
+
+/* --- Interactive hero headline phrases ------------------------------------ */
+
+.headline-phrase {
+  position: relative;
+  display: inline;
+  color: var(--color-ink);
+  padding: 0.04em 0.18em 0.11em;
+  margin: 0 -0.06em;
+  border-radius: 0.25rem;
+  background-color: rgb(16 185 129 / 0.03);
+  background-image:
+    linear-gradient(90deg, var(--color-safe), #34d399),
+    linear-gradient(90deg, rgb(16 185 129 / 0.48), rgb(16 185 129 / 0.48));
+  background-position:
+    0 100%,
+    0 100%;
+  background-repeat: no-repeat;
+  background-size:
+    0% 2px,
+    100% 2px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition-property: color, background-color, background-size, box-shadow, text-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.headline-phrase.headline-phrase-active {
+  color: #10b981;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  text-shadow:
+    0 0 12px rgb(16 185 129 / 24%),
+    0 0 30px rgb(16 185 129 / 10%);
+}
+
+.headline-phrase-cue {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* PAROLE hero headline entrance and subtle emerald glow */
+.hero-headline {
+  animation: hero-title-enter 850ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.headline-phrase {
+  display: inline;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  transition:
+    color 500ms ease,
+    text-shadow 500ms ease;
+}
+
+.headline-phrase-active {
+  color: #10b981;
+  text-shadow:
+    0 0 12px rgb(16 185 129 / 24%),
+    0 0 30px rgb(16 185 129 / 10%);
+}
+
+@keyframes hero-title-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-headline {
+    animation: none;
+  }
+
+  .headline-phrase {
+    transition: none;
+  }
 }
